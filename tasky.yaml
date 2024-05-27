@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasky
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasky
+  template:
+    metadata:
+      labels:
+        app: tasky
+    spec:
+      serviceAccountName: cluster-admin-service
+      containers:
+      - name: tasky
+        image: 851725317527.dkr.ecr.eu-west-2.amazonaws.com/wiz:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGODB_URI
+          value: "mongodb://admin:password@172.31.19.159:27017/admin"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasky-service-external
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: tasky
